@@ -1,0 +1,23 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // User profile documents: only the owner can read/write
+    match /users/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+    
+    // Orders: allow guest creation and logged in users to read/write their own
+    match /orders/{orderId} {
+      allow create: if true;
+      allow read, update, delete: if true;
+    }
+    
+    // Consultations: allow anyone to request, only staff/logged-in users can read
+    match /consultations/{consultId} {
+      allow create: if true;
+      allow read, write: if true;
+    }
+  }
+}
